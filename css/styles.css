@@ -1,0 +1,964 @@
+/* 
+ * Fabric Simulator - Educational Edition
+ * Neumorphic UI Styles
+ */
+
+:root {
+  /* Main colors */
+  --bg-dark: #111;
+  --bg-surface: #222;
+  --bg-surface-lighter: #2a2a2a;
+  --text-primary: #fff;
+  --text-secondary: #aaa;
+  --accent-color: #1e90ff;
+  --shadow-light: rgba(255, 255, 255, 0.05);
+  --shadow-dark: rgba(0, 0, 0, 0.5);
+  
+  /* Neumorphic effect values */
+  --neu-distance: 5px;
+  --neu-blur: 10px;
+  --neu-border-radius: 10px;
+  
+  /* Sizes */
+  --panel-width: 320px;
+  --header-height: 60px;
+  --action-bar-height: 70px;
+  --section-spacing: 15px;
+}
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar but allow scrolling */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Canvas Container */
+#canvasContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* UI Container */
+#uiContainer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--panel-width);
+  height: 100%;
+  background-color: var(--bg-surface);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -5px 0 15px var(--shadow-dark);
+  transition: transform 0.3s ease;
+}
+
+/* Collapsed state for UI panel */
+#uiContainer.collapsed {
+  transform: translateX(calc(var(--panel-width) - 50px));
+  transition: transform 0.3s ease;
+}
+
+#uiContainer.collapsed .panel-header h2,
+#uiContainer.collapsed #controlPanel,
+#uiContainer.collapsed #actionBar {
+  visibility: hidden;
+}
+
+#uiContainer.collapsed #togglePanelBtn {
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--bg-surface);
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px var(--shadow-dark);
+  visibility: visible;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Panel Header */
+.panel-header {
+  height: var(--header-height);
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--shadow-dark);
+  position: relative;
+}
+
+.panel-header h2 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Mode Switch */
+.mode-switch {
+  display: flex;
+  background-color: var(--bg-dark);
+  border-radius: 20px;
+  padding: 3px;
+  margin-right: 10px;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 17px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+  background-color: var(--bg-surface-lighter);
+  color: var(--text-primary);
+  box-shadow: 0 2px 4px var(--shadow-dark);
+}
+
+/* Icon Button */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Control Panel (Scrollable Area) */
+#controlPanel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+/* Control Section */
+.control-section {
+  margin-bottom: var(--section-spacing);
+  padding-bottom: var(--section-spacing);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-header h3 {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.expandable {
+  cursor: pointer;
+}
+
+.expand-btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  font-size: 12px;
+  margin-right: 5px;
+  color: var(--text-primary);
+  background: none;
+  cursor: pointer;
+}
+
+.expand-btn .fa-chevron-down {
+  transition: transform 0.3s ease;
+}
+
+.expanded .fa-chevron-down {
+  transform: rotate(180deg);
+}
+
+.section-content {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.section-content.collapsible {
+  max-height: 1000px;
+}
+
+.section-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Conditional controls that are shown/hidden based on mode */
+.conditional-control {
+  display: none;
+}
+
+.conditional-control.visible {
+  display: block;
+}
+
+/* No longer hiding advanced controls - all controls are visible by default */
+.advanced-control {
+  display: block;
+}
+
+/* Option Switchers (like the S/M/L/XL buttons in reference) */
+.option-switcher {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.option-btn {
+  flex: 1;
+  padding: 10px 5px;
+  background-color: var(--bg-dark);
+  color: var(--text-secondary);
+  border: none;
+  border-radius: var(--neu-border-radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: inset 2px 2px 5px var(--shadow-dark), 
+              inset -2px -2px 5px var(--shadow-light);
+}
+
+.option-btn.active {
+  background-color: var(--bg-surface-lighter);
+  color: var(--text-primary);
+  box-shadow: inset 2px 2px 5px var(--shadow-dark),
+              inset -1px -1px 3px var(--shadow-light),
+              0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Sub section */
+.sub-section {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.sub-section h4 {
+  font-size: 14px;
+  font-weight: normal;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+/* Parameter Controls */
+.parameter-control {
+  margin-bottom: 15px;
+}
+
+.param-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.param-header label {
+  flex: 1;
+  font-size: 14px;
+}
+
+/* Neumorphic Toggle Switch */
+.toggle-container {
+  position: relative;
+  width: 50px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-label {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-dark);
+  border-radius: 24px;
+  transition: .3s;
+  box-shadow: inset 2px 2px 4px var(--shadow-dark),
+              inset -2px -2px 4px var(--shadow-light);
+}
+
+.toggle-label:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--bg-surface-lighter);
+  border-radius: 50%;
+  transition: .3s;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-input:checked + .toggle-label {
+  background-color: var(--accent-color);
+}
+
+.toggle-input:checked + .toggle-label:before {
+  transform: translateX(26px);
+  background-color: white;
+}
+
+/* Info Button */
+.info-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.info-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Slider Container */
+.slider-container {
+  display: none;
+  padding: 5px 0;
+}
+
+.slider-container[data-active="true"] {
+  display: block;
+}
+
+/* Neumorphic Slider */
+.neumorphic-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background-color: var(--bg-dark);
+  outline: none;
+  box-shadow: inset 2px 2px 4px var(--shadow-dark),
+              inset -2px -2px 4px var(--shadow-light);
+  margin: 10px 0;
+}
+
+.neumorphic-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-surface-lighter);
+  cursor: pointer;
+  box-shadow: 2px 2px 5px var(--shadow-dark),
+              -1px -1px 3px var(--shadow-light);
+}
+
+.neumorphic-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-surface-lighter);
+  cursor: pointer;
+  box-shadow: 2px 2px 5px var(--shadow-dark),
+              -1px -1px 3px var(--shadow-light);
+  border: none;
+}
+
+.slider-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+  float: right;
+}
+
+/* Sub-sliders for wind controls */
+.sub-sliders {
+  display: none;
+  margin-left: 10px;
+}
+
+.sub-sliders[data-active="true"] {
+  display: block;
+}
+
+.sub-slider {
+  margin-bottom: 8px;
+}
+
+.sub-slider label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+/* Radio Buttons - Completely redesigned for better visibility */
+.radio-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.radio-container {
+  position: relative;
+  padding: 8px 8px 8px 35px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-dark);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.radio-container:hover {
+  background-color: var(--bg-surface-lighter);
+}
+
+.radio-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-container input:checked ~ .radio-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Custom radio button */
+.radio-label {
+  position: relative;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.radio-label:before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--bg-dark);
+  box-shadow: inset 2px 2px 5px var(--shadow-dark),
+              inset -2px -2px 5px var(--shadow-light);
+}
+
+.radio-container input:checked ~ .radio-label:after {
+  content: '';
+  position: absolute;
+  left: -19px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  box-shadow: 0 0 5px var(--accent-color);
+}
+
+/* Selected state */
+.radio-container input:checked + .radio-label {
+  color: var(--text-primary);
+}
+
+.radio-container input:checked {
+  background-color: var(--bg-surface-lighter);
+}
+
+/* Enhanced radio tooltips */
+.radio-tooltip {
+  display: none;
+  position: fixed;
+  background-color: var(--bg-surface-lighter);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  z-index: 100;
+  max-width: 250px;
+  box-shadow: 0 5px 15px var(--shadow-dark);
+  top: auto;
+  left: auto;
+  right: 340px;
+}
+
+.radio-container:hover .radio-tooltip {
+  display: block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Action Bar (Bottom) */
+#actionBar {
+  height: var(--action-bar-height);
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--shadow-dark);
+}
+
+.action-btn {
+  min-width: 80px;
+  height: 44px;
+  border: none;
+  border-radius: var(--neu-border-radius);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 3px 3px 7px var(--shadow-dark),
+              -2px -2px 5px var(--shadow-light);
+}
+
+.action-btn i {
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.action-btn.primary {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.action-btn:active {
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+              inset -2px -2px 5px rgba(255, 255, 255, 0.05);
+  transform: translateY(1px);
+}
+
+/* Neumorphic Styling - Enhanced with better 3D effect */
+.neumorphic {
+  border-radius: var(--neu-border-radius);
+  background-color: var(--bg-surface);
+  box-shadow: var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--shadow-dark),
+              calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--shadow-light);
+  transition: all 0.2s ease;
+}
+
+.neumorphic:active {
+  box-shadow: inset 2px 2px 5px var(--shadow-dark),
+              inset -2px -2px 5px var(--shadow-light);
+  transform: translateY(1px);
+}
+
+.neumorphic-inset {
+  border-radius: var(--neu-border-radius);
+  background-color: var(--bg-surface);
+  box-shadow: inset var(--neu-distance) var(--neu-distance) var(--neu-blur) var(--shadow-dark),
+              inset calc(var(--neu-distance) * -1) calc(var(--neu-distance) * -1) var(--neu-blur) var(--shadow-light);
+}
+
+/* Drag Mode Visual Feedback */
+.drag-cursor {
+  cursor: grab !important;
+}
+
+.dragging {
+  cursor: grabbing !important;
+}
+
+/* Hover states for interactive elements */
+.option-btn:hover, 
+.action-btn:hover,
+.info-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+/* Enhanced Tooltip */
+#tooltip {
+  position: fixed;
+  background-color: var(--bg-surface-lighter);
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 300px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 5px 15px var(--shadow-dark), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(5px);
+  border-left: 3px solid var(--accent-color);
+}
+
+#tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Educational Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s;
+}
+
+/* Canvas highlighting for drag mode */
+.drag-highlight {
+  border: 2px dashed var(--accent-color);
+  box-sizing: border-box;
+}
+
+/* Visual feedback for draggable points */
+.draggable-point:hover {
+  cursor: grab;
+}
+
+.draggable-point.active {
+  cursor: grabbing;
+}
+
+/* Visualization rendering improvements */
+.visualization-cloth {
+  filter: contrast(1.1) brightness(1.05);
+}
+
+.visualization-stress {
+  filter: saturate(1.2) contrast(1.2);
+}
+
+.visualization-structure {
+  filter: brightness(1.1) contrast(1.1);
+}
+
+.modal.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  background-color: var(--bg-surface);
+  border-radius: var(--neu-border-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--shadow-dark);
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Responsive Design - Enhanced mobile experience */
+@media (max-width: 768px) {
+  :root {
+    --panel-width: 100%;
+    --mobile-panel-height: 60%;
+    --mobile-title-height: 60px;
+  }
+  
+  #uiContainer {
+    position: fixed;
+    height: var(--mobile-panel-height);
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    box-shadow: 0 -5px 15px var(--shadow-dark);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+  }
+  
+  #uiContainer.collapsed {
+    transform: translateY(calc(100% - var(--mobile-title-height)));
+  }
+  
+  /* Keep the panel header visible when collapsed */
+  .panel-header {
+    position: relative;
+    height: var(--mobile-title-height);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--shadow-dark);
+    z-index: 10;
+    background-color: var(--bg-surface);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+  
+  /* Make toggle button more visible and touchable */
+  #togglePanelBtn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    font-size: 20px;
+  }
+  
+  /* Indicator for drag handle */
+  .panel-header:before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background-color: var(--text-secondary);
+    border-radius: 4px;
+    opacity: 0.5;
+  }
+  
+  /* Handle scrolling better */
+  #controlPanel {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    height: calc(var(--mobile-panel-height) - var(--mobile-title-height) - var(--action-bar-height));
+    padding: 15px 20px;
+  }
+  
+  /* Bottom action bar stays fixed */
+  #actionBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--action-bar-height);
+    padding: 10px 20px;
+    z-index: 5;
+  }
+  
+  /* Make buttons bigger for touch */
+  .option-btn {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  /* Action buttons optimized for mobile */
+  .action-btn {
+    height: 50px;
+    min-width: 90px;
+    font-size: 15px;
+  }
+  
+  .action-btn i {
+    font-size: 18px;
+  }
+  
+  /* Modal content for mobile */
+  .modal-content {
+    width: 95%;
+    max-height: 80vh;
+  }
+  
+  /* Show the handle pull indicator more prominently when collapsed */
+  #uiContainer.collapsed .panel-header:before {
+    opacity: 0.8;
+    width: 50px;
+  }
+  
+  /* Update hamburger icon animation */
+  #uiContainer.collapsed #togglePanelBtn i {
+    transform: rotate(180deg);
+  }
+}
+
+/* Phone-specific additional tweaks */
+@media (max-width: 480px) {
+  :root {
+    --mobile-panel-height: 70%; /* More screen space on phones */
+  }
+  
+  /* Increase font sizes for readability */
+  body {
+    font-size: 16px;
+  }
+  
+  .panel-header h2 {
+    font-size: 20px;
+  }
+  
+  /* Better spacing for small screens */
+  .control-section {
+    margin-bottom: 20px;
+  }
+  
+  /* Larger touch targets */
+  .toggle-container {
+    width: 60px;
+    height: 30px;
+  }
+  
+  .toggle-label:before {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Ensure tooltip placement works on small screens */
+  .radio-tooltip {
+    right: 10px;
+    max-width: 200px;
+  }
+}
+
+/* iOS-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Fixes for iOS Safari */
+  body {
+    /* Prevent elastic scrolling effects */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Prevent rubber-banding/overscroll effect */
+  #controlPanel {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
+    padding-bottom: 70px; /* Extra padding to ensure we can scroll to see all content */
+  }
+  
+  /* Improve button touch feedback */
+  .option-btn:active, 
+  .action-btn:active,
+  .toggle-container:active,
+  .radio-container:active,
+  .info-btn:active {
+    opacity: 0.7 !important;
+    transform: scale(0.97) !important;
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  
+  /* Fix modal scrolling on iOS */
+  .modal-body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Prevent text selection on elements */
+  .control-section, .option-btn, .panel-header, .modal-header {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Fix touch delay */
+  * {
+    /* Remove 300ms delay on iOS touch events */
+    touch-action: manipulation;
+  }
+  
+  /* Improve z-index handling for buttons */
+  .option-btn, .action-btn, .toggle-container, .info-btn, .expand-btn {
+    z-index: 5;
+    position: relative;
+  }
+  
+  /* Fix iOS focus rings */
+  *:focus {
+    outline: none;
+  }
+}
