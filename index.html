@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Fabric Simulator - Educational Edition</title>
   <!-- p5.js library -->
   <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.min.js"></script>
@@ -336,5 +338,46 @@
   <script src="js/simulator.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/education.js"></script>
+  
+  <!-- Fix for touch and click events on iOS -->
+  <script>
+    // Fix for touch and click events on iOS
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ensure togglePanelBtn is accessible and working
+      var toggleBtn = document.getElementById('togglePanelBtn');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (typeof togglePanel === 'function') {
+            togglePanel();
+          }
+        });
+      }
+      
+      // Prevent ghost clicks
+      var lastTouchEnd = 0;
+      document.addEventListener('touchend', function(e) {
+        var now = Date.now();
+        if (now - lastTouchEnd < 300) {
+          e.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+    });
+    
+    // Ensure p5 canvas doesn't swallow all events
+    window.addEventListener('load', function() {
+      var canvas = document.querySelector('#canvasContainer canvas');
+      if (canvas) {
+        canvas.style.touchAction = 'none';
+        // Limit canvas pointer events to prevent it capturing all touch/mouse events
+        canvas.addEventListener('pointerdown', function(e) {
+          if (e.target !== canvas) {
+            e.stopPropagation();
+          }
+        }, true);
+      }
+    });
+  </script>
 </body>
 </html>
