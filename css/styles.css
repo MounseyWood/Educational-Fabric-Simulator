@@ -24,6 +24,9 @@
   --header-height: 60px;
   --action-bar-height: 70px;
   --section-spacing: 15px;
+  
+  /* iOS viewport fix */
+  --vh: 1vh;
 }
 
 /* Global Reset */
@@ -72,10 +75,10 @@ body, html {
   display: flex;
   flex-direction: column;
   box-shadow: -5px 0 15px var(--shadow-dark);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, visibility 0s, opacity 0.3s;
 }
 
-/* Collapsed state for UI panel */
+/* Collapsed state for UI panel - Desktop */
 #uiContainer.collapsed {
   transform: translateX(calc(var(--panel-width) - 50px));
   transition: transform 0.3s ease;
@@ -85,6 +88,8 @@ body, html {
 #uiContainer.collapsed #controlPanel,
 #uiContainer.collapsed #actionBar {
   visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 0.3s, opacity 0.3s;
 }
 
 #uiContainer.collapsed #togglePanelBtn {
@@ -96,7 +101,7 @@ body, html {
   background-color: var(--bg-surface);
   border-radius: 50%;
   box-shadow: 2px 2px 5px var(--shadow-dark);
-  visibility: visible;
+  visibility: visible !important; /* Ensure it's always visible */
   z-index: 200;
   display: flex;
   align-items: center;
@@ -701,8 +706,8 @@ body, html {
   flex: 1;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Design - improved for tablets and mobile */
+@media (max-width: 1024px) { /* Increased to include iPad */
   :root {
     --panel-width: 100%;
   }
@@ -713,10 +718,20 @@ body, html {
     top: auto;
     width: 100%;
     box-shadow: 0 -5px 15px var(--shadow-dark);
+    transition: transform 0.3s ease;
   }
   
   #uiContainer.collapsed {
-    transform: translateY(calc(100% - var(--header-height)));
+    transform: translateY(calc(100% - var(--header-height))) !important;
+  }
+  
+  #uiContainer.collapsed #togglePanelBtn {
+    position: absolute;
+    top: -40px;
+    left: 20px;
+    background-color: var(--bg-surface);
+    border-radius: 50%;
+    box-shadow: 0 -2px 5px var(--shadow-dark);
   }
   
   .panel-header {
@@ -730,5 +745,12 @@ body, html {
   
   .modal-content {
     width: 95%;
+  }
+}
+
+/* Use the custom vh variable for height calculations on iOS */
+@supports (-webkit-touch-callout: none) {
+  #uiContainer, #canvasContainer {
+    height: calc(100 * var(--vh));
   }
 }
