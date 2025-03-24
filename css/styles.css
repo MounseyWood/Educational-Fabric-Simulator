@@ -34,6 +34,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  /* Removed problematic property: -moz-osx-font-smoothing: grayscale; */
 }
 
 body, html {
@@ -75,13 +77,16 @@ body, html {
   display: flex;
   flex-direction: column;
   box-shadow: -5px 0 15px var(--shadow-dark);
-  transition: transform 0.3s ease, visibility 0s, opacity 0.3s;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  touch-action: manipulation;
 }
 
 /* Collapsed state for UI panel - Desktop */
 #uiContainer.collapsed {
   transform: translateX(calc(var(--panel-width) - 50px));
-  transition: transform 0.3s ease;
 }
 
 #uiContainer.collapsed .panel-header h2,
@@ -106,6 +111,9 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: center;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Panel Header */
@@ -170,6 +178,7 @@ body, html {
   flex: 1;
   overflow-y: auto;
   padding: 15px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Control Section */
@@ -204,6 +213,8 @@ body, html {
   color: var(--text-primary);
   background: none;
   cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .expand-btn .fa-chevron-down {
@@ -262,6 +273,8 @@ body, html {
   transition: all 0.2s ease;
   box-shadow: inset 2px 2px 5px var(--shadow-dark), 
               inset -2px -2px 5px var(--shadow-light);
+  min-height: 44px;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .option-btn.active {
@@ -329,6 +342,8 @@ body, html {
   transition: .3s;
   box-shadow: inset 2px 2px 4px var(--shadow-dark),
               inset -2px -2px 4px var(--shadow-light);
+  min-height: 44px;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .toggle-label:before {
@@ -366,6 +381,8 @@ body, html {
   align-items: center;
   justify-content: center;
   position: relative;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .info-btn:hover {
@@ -593,6 +610,7 @@ body, html {
   transition: all 0.2s ease;
   box-shadow: 3px 3px 7px var(--shadow-dark),
               -2px -2px 5px var(--shadow-light);
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .action-btn i {
@@ -740,76 +758,31 @@ body, html {
   }
   
   .option-btn {
-    min-height: 44px; /* Better for touch */
-  }
-  
-  .modal-content {
-    width: 95%;
-  }
-}
-
-/* Use the custom vh variable for height calculations on iOS */
-@supports (-webkit-touch-callout: none) {
-  #uiContainer, #canvasContainer {
-    height: calc(100 * var(--vh));
-  }
-}
-/* CSS fixes to add at the end of your styles.css file */
-
-/* Remove problematic CSS properties */
-* {
-  -webkit-font-smoothing: antialiased;
-  /* Remove the problematic property causing warnings */
-  /* -moz-osx-font-smoothing: grayscale; */
-}
-
-/* Ensure UI is responsive */
-#uiContainer, #togglePanelBtn {
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  touch-action: manipulation;
-}
-
-/* Improve touch target sizes */
-.toggle-label, .option-btn, .info-btn, .expand-btn, .action-btn {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Simplified transitions for better performance */
-#uiContainer {
-  transition: transform 0.3s ease;
-}
-
-#uiContainer.collapsed {
-  transform: translateX(calc(var(--panel-width) - 50px));
-}
-
-/* Mobile-specific fixes */
-@media (max-width: 1024px) {
-  #uiContainer.collapsed {
-    transform: translateY(calc(100% - var(--header-height)));
-  }
-  
-  /* Prevent content from being hidden under bottom navigation on mobile */
-  body {
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-  
-  /* Larger touch targets on mobile */
-  .option-btn, .action-btn {
-    min-height: 48px;
+    min-height: 48px; /* Better for touch */
   }
   
   .toggle-label:before {
     width: 22px;
     height: 22px;
   }
+  
+  .modal-content {
+    width: 95%;
+  }
+  
+  /* Prevent content from being hidden under bottom navigation on mobile */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 }
 
 /* Fix for known iOS WebKit bugs */
 @supports (-webkit-touch-callout: none) {
+  /* Use the custom vh variable for height calculations on iOS */
+  #uiContainer, #canvasContainer {
+    height: calc(100 * var(--vh));
+  }
+  
   /* Prevent unwanted scrolling */
   html, body {
     position: fixed;
