@@ -754,3 +754,82 @@ body, html {
     height: calc(100 * var(--vh));
   }
 }
+/* CSS fixes to add at the end of your styles.css file */
+
+/* Remove problematic CSS properties */
+* {
+  -webkit-font-smoothing: antialiased;
+  /* Remove the problematic property causing warnings */
+  /* -moz-osx-font-smoothing: grayscale; */
+}
+
+/* Ensure UI is responsive */
+#uiContainer, #togglePanelBtn {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  touch-action: manipulation;
+}
+
+/* Improve touch target sizes */
+.toggle-label, .option-btn, .info-btn, .expand-btn, .action-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Simplified transitions for better performance */
+#uiContainer {
+  transition: transform 0.3s ease;
+}
+
+#uiContainer.collapsed {
+  transform: translateX(calc(var(--panel-width) - 50px));
+}
+
+/* Mobile-specific fixes */
+@media (max-width: 1024px) {
+  #uiContainer.collapsed {
+    transform: translateY(calc(100% - var(--header-height)));
+  }
+  
+  /* Prevent content from being hidden under bottom navigation on mobile */
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  
+  /* Larger touch targets on mobile */
+  .option-btn, .action-btn {
+    min-height: 48px;
+  }
+  
+  .toggle-label:before {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Fix for known iOS WebKit bugs */
+@supports (-webkit-touch-callout: none) {
+  /* Prevent unwanted scrolling */
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  #canvasContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Allow scrolling only in control panel */
+  #controlPanel {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+}
